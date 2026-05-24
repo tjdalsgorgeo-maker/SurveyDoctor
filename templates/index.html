@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Survey Doctor - URL 자동 추출 시스템</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f9; padding: 40px 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #1a73e8; text-align: center; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 20px; }
+        button { width: 100%; background-color: #1a73e8; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        button:hover { background-color: #1557b0; }
+        .loading { display: none; text-align: center; margin: 20px 0; font-weight: bold; color: #1a73e8; }
+        .result-view { display: none; margin-top: 40px; border-top: 2px solid #f0f0f0; padding-top: 30px; }
+        .score-container { text-align: center; margin-bottom: 25px; }
+        .score-badge { display: inline-block; background: #e8f0fe; color: #1a73e8; font-size: 48px; font-weight: bold; padding: 10px 30px; border-radius: 50px; }
+        .card { background: #f8fafc; border-left: 5px solid #1a73e8; padding: 15px; border-radius: 4px; margin-bottom: 15px; }
+        .card-type { font-weight: bold; color: #1a73e8; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🌐 Survey Doctor</h1>
+    <div class="subtitle">설문지 URL 링크 기반 실시간 원격 진단 에이전트</div>
+    
+    <input type="text" id="surveyUrl" placeholder="분석할 구글 폼, 네이버 폼 등의 전체 URL 주소를 입력하세요...">
+    <button onclick="startDiagnosis()">진단 시작 🚀</button>
+    
+    <div id="loadingZone" class="loading">🩺 Playwright 브라우저가 설문지에 원격 접속하여 문항을 수집하고 있습니다. 잠시만 기다려주세요...</div>
+    
+    <div id="result-view" class="result-view">
+        <div class="score-container">
+            <div class="score-badge"><span id="scoreField">0</span>점</div>
+            <div style="margin-top:10px; font-size:18px;" id="summaryField">요약 리포트</div>
+        </div>
+        <h3>📋 세부 정밀 진단 리포트</h3>
+        <div id="detailsList"></div>
+    </div>
+</div>
+
+<script>
+    async function startDiagnosis() {
+        const url = document.getElementById('surveyUrl').value.trim();
+        if(!url) { alert('설문지 링크를 입력해 주세요!'); return; }
+        
+        document.getElementById('loadingZone').style.display = 'block';
+        document.getElementById('result-view').style.display = 'none';
+        
+        try {
+            // 로컬 파썬 웹 서버의 엔드포인트 호출
+            const response = await fetch('/diagnose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ surveyUrl: url })
+            });
+            
+            const result = await response.json();
+            if(result.status === 'success') {
+                document.getElementById('scoreField').innerText = result.data.score;
+                document.getElementById('summaryField').innerText = result.data.summary;
+                
+                const list = document.getElementById('detailsList');
+                list.innerHTML = '';
+                result.data.details.forEach(item => {
+                    list.innerHTML += `<div class="card"><div class="card-type">🔍 ${item.type}</div><div>${item.message}</div></div>`;
+                });
+                document.getElementById('result-view').style.display = 'block';
+            } else {
+                alert('진단 실패: ' + result.message);
+            }
+        } catch (error) {
+            alert('파이썬 서버와 통신할 수 없습니다.');
+        } finally {
+            document.getElementById('loadingZone').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
