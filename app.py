@@ -8,7 +8,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # ⚠️ [보안] API Key는 소스코드에 직접 적지 않고, 클라우드(Render) 환경변수에 등록하여 숨깁니다.
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyAhL8vtTKCgxrDQin_Wos7HwxMGhcujwkk")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # ⚠️ 1단계에서 복사한 본인의 구글 문서 ID를 여기에 붙여넣으세요.
