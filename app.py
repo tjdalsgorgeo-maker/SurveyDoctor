@@ -12,7 +12,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "YOUR_ACTUAL_GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # ⚠️ 1단계에서 복사한 본인의 구글 문서 ID를 여기에 붙여넣으세요.
-GOOGLE_DOC_ID = "여기에_구글_문서_ID를_입력하세요"
+GOOGLE_DOC_ID = "1gHg2ibN0zZUuiu_mKH0zSd7U4o_TekFKbzt1O4k_cQA"
 
 # 1. 구글 문서(Google Docs)로부터 실시간 가이드라인 텍스트 긁어오기
 def get_google_doc_guideline(doc_id):
