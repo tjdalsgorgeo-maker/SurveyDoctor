@@ -1,11 +1,13 @@
 import os
 import json
 import requests
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from playwright.sync_api import sync_playwright
 import google.generativeai as genai
 
 app = Flask(__name__)
+CORS(app)
 
 # ⚠️ [보안] API Key는 소스코드에 직접 적지 않고, 클라우드(Render) 환경변수에 등록하여 숨깁니다.
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -49,12 +51,7 @@ def scrape_survey_content(url):
         browser.close()
         return survey_text
 
-# 3. 메인 대시보드 페이지 렌더링
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# 4. 비동기 진단 API 엔드포인트
+# 3. 비동기 진단 API 엔드포인트
 @app.route('/diagnose', methods=['POST'])
 def diagnose():
     try:
